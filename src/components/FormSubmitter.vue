@@ -1,6 +1,10 @@
 <template>
     <div>
-        <form @submit.prevent="handleSubmit">
+        <form  @submit.prevent="handleSubmitAsync" v-if="asyncTest">
+            <input v-model="username" data-username>
+            <input type="submit">
+        </form>
+        <form @submit.prevent="handleSubmit" v-else>
             <input v-model="username" data-username>
             <input type="submit">
         </form>
@@ -16,19 +20,29 @@
 
 <script>
 export default {
-    name: "FormSUbmitter",
+    name: "FormSubmitter",
 
     data () {
         return {
             username: '',
-            submitted: false
+            submitted: false,
+            asyncTest: false
         }
     },
 
     methods: {
+        handleSubmitAsync () {
+            return this.$http.get("/api/v1/register", { username: this.username })
+                .then(() => {
+                    this.submitted = true
+                })
+                .catch((e) => {
+                    throw Error("Something went wrong", e)
+                })
+        },
         handleSubmit() {
             this.submitted = true
-        }
+        } 
     }
 }
 </script>
